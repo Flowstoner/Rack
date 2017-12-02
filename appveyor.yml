@@ -1,0 +1,21 @@
+version: '{branch}.{build}'
+skip_tags: true
+platform: x64
+clone_depth: 1
+environment:
+  matrix:
+  - MSYSTEM: MINGW64
+    PATH: C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%
+    APPVEYOR_CACHE_SKIP_RESTORE: false
+install:
+- cmd: >-
+    C:\msys64\usr\bin\bash -lc "pacman --noconfirm --needed -S git make tar unzip mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake"
+
+    git submodule update --init --recursive
+cache: '%APPVEYOR_BUILD_FOLDER%/dep -> Makefile'
+build_script:
+- cmd: >-
+    if not exist %APPVEYOR_BUILD_FOLDER%\dep\lib C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; make dep ARCH=win"
+
+    C:\msys64\usr\bin\bash -lc "cd $APPVEYOR_BUILD_FOLDER; make ARCH=win"
+test: off
